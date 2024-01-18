@@ -1944,7 +1944,6 @@ void i915_ggtt_set_space_owner(struct i915_ggtt *ggtt, u16 vfid,
 	const gen8_pte_t pte = i915_ggtt_prepare_vf_pte(vfid);
 	u64 base = node->start;
 	u64 size = node->size;
-	int ret = 0;
 
 	GEM_BUG_ON(!IS_SRIOV_PF(ggtt->vm.i915));
 	GEM_BUG_ON(base % PAGE_SIZE);
@@ -1959,55 +1958,12 @@ void i915_ggtt_set_space_owner(struct i915_ggtt *ggtt, u16 vfid,
 	    gen8_ggtt_bind_ptes(ggtt, base >> PAGE_SHIFT, NULL, size / PAGE_SIZE, pte))
 		goto invalidate;
 
-	if (intel_gt_is_bind_context_ready(ggtt->vm.gt)) {
-		struct sg_table *st;
-		struct scatterlist *sg;
-		u64 n_ptes = (size / PAGE_SIZE);
-
-		st = kmalloc(sizeof(*st), GFP_KERNEL);
-		if (!st) {
-			ret = -ENOMEM;
-			goto cpu_update;
-		}
-
-		ret = sg_alloc_table(st, n_ptes, GFP_KERNEL);
-		if (ret) {
-			kfree(st);
-			goto cpu_update;
-		}
-
-		sg = st->sgl;
-		st->nents = 0;
-
-		while (size) {
-			st->nents++;
-			sg_set_page(sg, NULL, I915_GTT_PAGE_SIZE, 0);
-			sg_dma_address(sg) = 0;
-			sg_dma_len(sg) = I915_GTT_PAGE_SIZE;
-			sg = sg_next(sg);
-			size -= PAGE_SIZE;
-		}
-
-		ret = gen8_ggtt_bind_ptes(ggtt, base >> PAGE_SHIFT, st, n_ptes, pte);
-
-		sg_free_table(st);
-		kfree(st);
-		if (ret) {
-			WARN_ON(ret);
-			goto cpu_update;
-		}
-	} else {
-		goto cpu_update;
-	}
-	goto invalidate;
-
-cpu_update:
 	gtt_entries += base >> PAGE_SHIFT;
-	size = node->size;
 	while (size) {
 		gen8_set_pte(gtt_entries++, pte);
 		size -= PAGE_SIZE;
 	}
+
 invalidate:
 	ggtt->invalidate(ggtt);
 }
