@@ -18,6 +18,9 @@
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_vblank.h>
 
+#ifdef I915
+#include "i915_drv.h"
+#endif
 #include "i9xx_wm.h"
 #include "intel_acpi.h"
 #include "intel_atomic.h"
@@ -204,6 +207,9 @@ int intel_display_driver_probe_noirq(struct intel_display *display)
 {
 	int ret;
 
+#ifdef I915
+	if (!IS_SRIOV_VF(to_i915(display->drm)))
+#endif
 	intel_opregion_setup(display);
 
 	/*
