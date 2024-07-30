@@ -7,6 +7,12 @@
 
 #include <drm/drm_print.h>
 
+// TODO: Disable display initialization on VF to align with Xe
+#ifdef I915
+#include "i915_drv.h"
+#include "i915_sriov.h"
+#endif
+
 #include "i9xx_wm.h"
 #include "intel_display_core.h"
 #include "intel_display_types.h"
@@ -169,8 +175,21 @@ void intel_print_wm_latency(struct intel_display *display,
 	}
 }
 
+static const struct intel_wm_funcs nop_wm_func = {
+};
+
 void intel_wm_init(struct intel_display *display)
 {
+#ifdef I915
+	struct drm_i915_private *i915 = to_i915(display->drm);
+
+	if (IS_SRIOV_VF(i915)) {
+		/* XXX */
+		i915->display->funcs.wm = &nop_wm_func;
+		return;
+	}
+#endif
+
 	if (DISPLAY_VER(display) >= 9)
 		skl_wm_init(display);
 	else
