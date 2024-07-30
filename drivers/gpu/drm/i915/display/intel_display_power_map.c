@@ -5,6 +5,8 @@
 
 #include <drm/drm_print.h>
 
+#include "i915_drv.h"
+#include "i915_reg.h"
 #include "intel_display_core.h"
 #include "intel_display_power_map.h"
 #include "intel_display_power_well.h"
@@ -1868,6 +1870,7 @@ int intel_display_power_map_init(struct i915_power_domains *power_domains)
 	struct intel_display *display = container_of(power_domains,
 						     struct intel_display,
 						     power.domains);
+	struct drm_i915_private *i915 = to_i915(display->drm);
 	/*
 	 * The enabling order will be from lower to higher indexed wells,
 	 * the disabling order is reversed.
@@ -1877,7 +1880,9 @@ int intel_display_power_map_init(struct i915_power_domains *power_domains)
 		return 0;
 	}
 
-	if (DISPLAY_VERx100(display) == 3002)
+	if (IS_SRIOV_VF(i915))
+		return set_power_wells(power_domains, i9xx_power_wells);
+	else if (DISPLAY_VERx100(display) == 3002)
 		return set_power_wells(power_domains, wcl_power_wells);
 	else if (DISPLAY_VER(display) >= 30)
 		return set_power_wells(power_domains, xe3lpd_power_wells);
