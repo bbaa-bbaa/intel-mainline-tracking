@@ -54,7 +54,7 @@ __diag_ignore_all("-Woverride-init", "Allow field overrides in table");
 #define NOP(x)	x
 
 static const struct xe_graphics_desc graphics_xelp = {
-	.hw_engine_mask = BIT(XE_HW_ENGINE_RCS0) | BIT(XE_HW_ENGINE_BCS0),
+	.hw_engine_mask = BIT(XE_HW_ENGINE_RCS0) | BIT(XE_HW_ENGINE_BCS0) | BIT(XE_HW_ENGINE_CCS0),
 	.num_geometry_xecore_fuse_regs = 1,
 };
 
@@ -217,7 +217,7 @@ static const struct xe_device_desc tgl_desc = {
 	.max_gt_per_tile = 1,
 	MULTI_LRC_MASK,
 	.require_force_probe = true,
-	.va_bits = 48,
+	.va_bits = 47,
 	.vm_max_level = 3,
 };
 
@@ -254,7 +254,7 @@ static const struct xe_device_desc adl_s_desc = {
 		{ XE_SUBPLATFORM_ALDERLAKE_S_RPLS, "RPLS", adls_rpls_ids },
 		{},
 	},
-	.va_bits = 48,
+	.va_bits = 47,
 	.vm_max_level = 3,
 };
 
@@ -276,7 +276,7 @@ static const struct xe_device_desc adl_p_desc = {
 		{ XE_SUBPLATFORM_ALDERLAKE_P_RPLU, "RPLU", adlp_rplu_ids },
 		{},
 	},
-	.va_bits = 48,
+	.va_bits = 47,
 	.vm_max_level = 3,
 };
 
@@ -292,7 +292,7 @@ static const struct xe_device_desc adl_n_desc = {
 	.max_gt_per_tile = 1,
 	MULTI_LRC_MASK,
 	.require_force_probe = true,
-	.va_bits = 48,
+	.va_bits = 47,
 	.vm_max_level = 3,
 };
 
