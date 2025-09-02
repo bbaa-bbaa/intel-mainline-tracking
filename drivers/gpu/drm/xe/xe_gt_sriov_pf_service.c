@@ -27,6 +27,7 @@ static const struct xe_reg tgl_runtime_regs[] = {
 	XELP_GT_SLICE_ENABLE,		/* _MMIO(0x9138) */
 	XELP_GT_GEOMETRY_DSS_ENABLE,	/* _MMIO(0x913c) */
 	GT_VEBOX_VDBOX_DISABLE,		/* _MMIO(0x9140) */
+	XEHP_GT_COMPUTE_DSS_ENABLE,	/* _MMIO(0x9144) */
 	HUC_KERNEL_LOAD_INFO,		/* _MMIO(0xc1dc) */
 };
 
