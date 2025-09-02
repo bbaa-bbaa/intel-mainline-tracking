@@ -48,9 +48,9 @@ __diag_ignore_all("-Woverride-init", "Allow field overrides in table");
 #define NOP(x)	x
 
 static const struct xe_graphics_desc graphics_xelp = {
-	.hw_engine_mask = BIT(XE_HW_ENGINE_RCS0) | BIT(XE_HW_ENGINE_BCS0),
+	.hw_engine_mask = BIT(XE_HW_ENGINE_RCS0) | BIT(XE_HW_ENGINE_BCS0) | BIT(XE_HW_ENGINE_CCS0),
 
-	.va_bits = 48,
+	.va_bits = 47,
 	.vm_max_level = 3,
 };
 
