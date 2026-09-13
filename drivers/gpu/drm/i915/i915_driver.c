@@ -1578,14 +1578,16 @@ static int i915_pm_runtime_suspend(struct device *kdev)
 	for_each_gt(gt, dev_priv, i)
 		intel_uncore_suspend(gt->uncore);
 
-	intel_display_driver_pm_runtime_suspend_late(display);
+	if (intel_display_device_present(display))
+		intel_display_driver_pm_runtime_suspend_late(display);
 
 	ret = vlv_suspend_complete(dev_priv);
 	if (ret) {
 		drm_err(&dev_priv->drm,
 			"Runtime suspend failed, disabling it (%d)\n", ret);
 
-		intel_display_driver_pm_runtime_resume_early(display);
+		if (intel_display_device_present(display))
+			intel_display_driver_pm_runtime_resume_early(display);
 
 		for_each_gt(gt, dev_priv, i)
 			intel_uncore_runtime_resume(gt->uncore);
@@ -1650,7 +1652,8 @@ static int i915_pm_runtime_resume(struct device *kdev)
 		drm_dbg(&dev_priv->drm,
 			"Unclaimed access during suspend, bios?\n");
 
-	intel_display_driver_pm_runtime_resume_early(display);
+	if (intel_display_device_present(display))
+		intel_display_driver_pm_runtime_resume_early(display);
 
 	ret = vlv_resume_prepare(dev_priv, true);
 
