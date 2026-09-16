@@ -410,6 +410,19 @@ static u32 ring_cmd_cctl_val(struct xe_gt *gt, struct xe_hw_engine *hwe)
 		REG_FIELD_PREP(CMD_CCTL_READ_OVERRIDE_MASK, mocs_read_idx);
 }
 
+static bool xe_hw_engine_match_enable_ccs(const struct xe_device *xe,
+					  const struct xe_gt *gt,
+					  const struct xe_hw_engine *hwe)
+{
+	if (GRAPHICS_VERx100(xe) >= 1255)
+		return xe_rtp_match_first_render_or_compute(xe, gt, hwe);
+
+	if (gt->info.engine_mask & XE_HW_ENGINE_CCS_MASK)
+		return xe_rtp_match_first_render_or_compute(xe, gt, hwe);
+
+	return false;
+}
+
 static const struct xe_rtp_table_sr engine_sr = XE_RTP_TABLE_SR(
 	{ XE_RTP_NAME("RING_CMD_CCTL_default_MOCS"),
 	  XE_RTP_RULES(FUNC(xe_rtp_match_always)),
@@ -452,8 +465,7 @@ static const struct xe_rtp_table_sr engine_sr = XE_RTP_TABLE_SR(
 			     XE_RTP_ACTION_FLAG(ENGINE_BASE)))
 	},
 	{ XE_RTP_NAME("Enable CCS Engine(s)"),
-	  XE_RTP_RULES(GRAPHICS_VERSION_RANGE(1255, XE_RTP_END_VERSION_UNDEFINED),
-		       FUNC(xe_rtp_match_first_render_or_compute)),
+	  XE_RTP_RULES(FUNC(xe_hw_engine_match_enable_ccs)),
 	  XE_RTP_ACTIONS(SET(RCU_MODE, RCU_MODE_CCS_ENABLE))
 	},
 	/* Use Fixed slice CCS mode */
